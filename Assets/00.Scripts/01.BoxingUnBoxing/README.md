@@ -82,7 +82,7 @@ IEnumerable<KeyValuePair<K, V>> iterator = dictionary;
 
 `IEnumerable<>`로 받아 foreach를 돌렸을 때 열거자가 박싱된 게 이 경우다.
 
-**3. 오버라이드하지 않은 상속 메서드를 부를 때** — 매개변수가 아예 없어도 일어난다.
+**3. struct가 오버라이드하지 않은 상속 메서드를 부를 때** — 매개변수가 아예 없어도 일어난다.
 
 ```csharp
 myStruct.GetHashCode();
@@ -90,6 +90,8 @@ myStruct.ToString();
 ```
 
 `ValueType.GetHashCode()`가 불려서 생긴 박싱 1회가 이 경우다. **"매개변수가 `object`인지 보면 된다"는 규칙으로는 이걸 못 잡는다.** 매개변수가 없으니까.
+
+이건 struct에만 해당한다. 클래스는 처음부터 힙에 있어서 옮길 것이 없으므로, 상속 메서드를 아무리 불러도 박싱이 없다. 그리고 struct라도 그 메서드를 직접 오버라이드하면 자기 메서드로 바로 호출되면서 박싱이 사라진다.
 
 **4. `params object[]`** — 인자마다 박싱되고 배열 할당까지 붙는다.
 
