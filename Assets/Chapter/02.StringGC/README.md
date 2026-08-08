@@ -140,4 +140,4 @@ textMesh.SetText("HP: {0}", currentHp);
 ## 실습 코드
 
 [StringGC.cs](StringGC.cs) — Inspector의 `Test Case`로 케이스를 전환하고 Profiler로 GC Alloc을 관찰한다.
-씬은 [02.StringGC.unity](../../Scenes/02.StringGC.unity).
+씬은 [02.StringGC.unity](02.StringGC.unity).

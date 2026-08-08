@@ -123,4 +123,4 @@ List<int>.Add(int item);    // 박싱 없음
 ## 실습 코드
 
 [Code.cs](Code.cs) — Inspector의 `Test Case`로 케이스를 전환하고 Profiler로 GC Alloc을 관찰한다.
-씬은 [01.BoxingUnBoxing.unity](../../Scenes/01.BoxingUnBoxing.unity).
+씬은 [01.BoxingUnBoxing.unity](01.BoxingUnBoxing.unity).
