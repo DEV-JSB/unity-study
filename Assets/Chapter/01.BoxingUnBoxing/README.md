@@ -1,5 +1,7 @@
 # 01. 박싱 / 언박싱 — Dictionary와 struct
 
+> 그림·코드로 다시 정리한 노트: [study-notes / boxing-dictionary](https://dev-jsb.github.io/study-notes/unity/boxing-dictionary.html)
+
 ## 발단
 
 몇백 개가 들어갈 수 있는 `List<T>`를 최악의 경우 1,000번 순회하면서, 그 안에서 계속 `Find`를 호출하는 코드를 봤다. 코드리뷰에서 "이럴 바에는 검색에 유리한 `Dictionary`에 넣는 게 어떻겠냐"고 제안했다.

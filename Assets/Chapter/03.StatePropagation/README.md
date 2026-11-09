@@ -1,5 +1,7 @@
 # 03. 상태 전파 — event, static, ReactiveProperty
 
+> 그림·코드로 다시 정리한 노트: [study-notes / state-propagation](https://dev-jsb.github.io/study-notes/unity/state-propagation.html)
+
 ## 발단
 
 `SkinIndex`가 있고, 이 값이 바뀌면 초상화와 SD 프리뷰가 따라 바뀌어야 했다. `UI_Skin`을 만들어 거기에 `SkinIndex`를 두고 이벤트를 붙였다.

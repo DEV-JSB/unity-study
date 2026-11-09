@@ -1,5 +1,7 @@
 # 02. 문자열과 GC
 
+> 그림·코드로 다시 정리한 노트: [study-notes / string-gc](https://dev-jsb.github.io/study-notes/unity/string-gc.html)
+
 ## 발단
 
 1편에서 박싱을 재봤지만 와닿지 않았다. `IEquatable`을 구현하지 않은 struct를 Dictionary 키로 쓰는 코드는 실무에서 거의 안 나오기 때문이다.
