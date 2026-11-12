@@ -12,3 +12,4 @@ Unity 6000.0.72f1 (URP) 학습 기록.
 | 02. 문자열과 GC | [README](Assets/Chapter/02.StringGC/README.md) | [string-gc](https://dev-jsb.github.io/study-notes/unity/string-gc.html) |
 | 03. 상태 전파 — event, static, ReactiveProperty | [README](Assets/Chapter/03.StatePropagation/README.md) | [state-propagation](https://dev-jsb.github.io/study-notes/unity/state-propagation.html) |
 | 04. float 정밀도 — 좌표가 커지면 캐릭터가 멈춘다 | [README](Assets/Chapter/04.FloatPrecision/README.md) | [float-precision](https://dev-jsb.github.io/study-notes/unity/float-precision.html) |
+| 05. 경쟁 상태와 lock — 같은 변수를 두 스레드가 더하면 값이 사라진다 | [README](Assets/Chapter/05.RaceCondition/README.md) | [race-condition](https://dev-jsb.github.io/study-notes/unity/race-condition.html) |
