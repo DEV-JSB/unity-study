@@ -108,7 +108,7 @@ namespace SkillFeatureStudy
         {
             if (!_uniqueActivateCount.TryAdd(eUniqueType, 1))
             {
-                _uniqueActivateCount[eUniqueType]++;
+                _uniqueActivateCount[eUniqueType] += count;
             }
         }
 
