@@ -19,11 +19,10 @@ namespace SkillFeatureStudy
     {
         public const float CriticalDamageMultiplier = 2f;
 
-        public static AttackResult CalculateBaseAttack(Hero attacker)
+        public static AttackResult CalculateBaseAttack(Hero attacker,bool isCritical)
         {
-            bool isCritical = false;
-
             float damage = attacker.attackPower;
+            
             if (isCritical)
             {
                 damage *= CriticalDamageMultiplier;

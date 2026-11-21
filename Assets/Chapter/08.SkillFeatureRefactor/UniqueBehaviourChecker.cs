@@ -125,7 +125,7 @@ namespace SkillFeatureStudy
         {
             var scenarioRecord = new ScenarioRecord("2. A 스테이지당 한 번 치명상 버티기");
             var hero = new Hero("Knight", 100f, 10f);
-            hero.Equip(UniqueType.SurviveLethalOncePerStage);
+            hero.Equip(EUniqueType.SurviveLethalOncePerStage);
             var stage = new Stage(hero);
             stage.StartStage();
 
@@ -147,15 +147,15 @@ namespace SkillFeatureStudy
         {
             var scenarioRecord = new ScenarioRecord("3. A 같은 스테이지에서 뺐다 끼기");
             var hero = new Hero("Knight", 100f, 10f);
-            hero.Equip(UniqueType.SurviveLethalOncePerStage);
+            hero.Equip(EUniqueType.SurviveLethalOncePerStage);
             var stage = new Stage(hero);
             stage.StartStage();
 
             hero.TakeDamage(150f);
             scenarioRecord.ExpectHp("체력 100에서 피해 150 → 버팀", hero, 1f);
 
-            hero.Unequip(UniqueType.SurviveLethalOncePerStage);
-            hero.Equip(UniqueType.SurviveLethalOncePerStage);
+            hero.Unequip(EUniqueType.SurviveLethalOncePerStage);
+            hero.Equip(EUniqueType.SurviveLethalOncePerStage);
             hero.TakeDamage(150f);
             scenarioRecord.ExpectHp("A를 뺐다 다시 끼고 피해 150 → 이미 써서 쓰러짐", hero, 0f);
             return scenarioRecord;
@@ -167,7 +167,7 @@ namespace SkillFeatureStudy
             var scenarioRecord = new ScenarioRecord("4. B 다섯 번째 평타마다 치명타");
 
             var attackerWithUnique = new Hero("Archer", 100f, 10f);
-            attackerWithUnique.Equip(UniqueType.EveryFifthBaseAttackCritical);
+            attackerWithUnique.Equip(EUniqueType.EveryFifthBaseAttackCritical);
             var targetOfUnique = new Hero("Dummy", 1000f, 0f);
             var stage = new Stage(attackerWithUnique, targetOfUnique);
             stage.StartStage();
@@ -197,19 +197,19 @@ namespace SkillFeatureStudy
             var stage = new Stage(hero);
             stage.StartStage();
 
-            hero.Equip(UniqueType.DamageTakenReduction10);
+            hero.Equip(EUniqueType.DamageTakenReduction10);
             hero.TakeDamage(100f);
             scenarioRecord.ExpectHp("C 한 개, 피해 100 → 90 받음", hero, 910f);
 
-            hero.Equip(UniqueType.DamageTakenReduction10);
+            hero.Equip(EUniqueType.DamageTakenReduction10);
             hero.TakeDamage(100f);
             scenarioRecord.ExpectHp("C 두 개, 피해 100 → 80 받음", hero, 830f);
 
-            hero.Unequip(UniqueType.DamageTakenReduction10);
+            hero.Unequip(EUniqueType.DamageTakenReduction10);
             hero.TakeDamage(100f);
             scenarioRecord.ExpectHp("C 하나 뺌(한 개 남음), 피해 100 → 90 받음", hero, 740f);
 
-            hero.Unequip(UniqueType.DamageTakenReduction10);
+            hero.Unequip(EUniqueType.DamageTakenReduction10);
             hero.TakeDamage(100f);
             scenarioRecord.ExpectHp("C 다 뺌, 피해 100 → 100 받음", hero, 640f);
             return scenarioRecord;
@@ -220,8 +220,8 @@ namespace SkillFeatureStudy
         {
             var scenarioRecord = new ScenarioRecord("6. A + C 순서 (감소 먼저, 치명상 판정 나중)");
             var hero = new Hero("Knight", 100f, 10f);
-            hero.Equip(UniqueType.SurviveLethalOncePerStage);
-            hero.Equip(UniqueType.DamageTakenReduction10);
+            hero.Equip(EUniqueType.SurviveLethalOncePerStage);
+            hero.Equip(EUniqueType.DamageTakenReduction10);
             var stage = new Stage(hero);
             stage.StartStage();
 

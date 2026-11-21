@@ -2,17 +2,28 @@ using System.Collections.Generic;
 
 namespace SkillFeatureStudy
 {
-    // 리팩토링 "전" 영웅. 장착 목록과 기본 피해 처리만 있다.
-    // 유니크 A·B·C 의 동작은 아직 없다. 작업자가 채운다 (규칙은 UniqueType.cs, 정답은 검사기).
+    // 리팩토링 "전" 영웅. 장착 목록, 피해 처리, 평타 횟수.
+    // 유니크 A·C 의 동작이 TakeDamage 안에 if 분기로 있다. A 사용 기록은 StartSetting 이 스테이지마다 지운다
+    // (규칙은 EUniqueType.cs, 정답은 검사기).
     public class Hero
     {
         public readonly string heroName;
         public readonly float attackPower;
+        private int _attackCount = 0;
+        public int AttackCount => _attackCount;
+        
+        
+        private readonly List<EUniqueType> _equippedUniques = new List<EUniqueType>();
 
-        private readonly List<UniqueType> _equippedUniques = new List<UniqueType>();
-
+        private int _surviveLethalOnceCount;
         public float CurrentHp { get; private set; }
 
+
+        public void IncreaseAttackCount()
+        {
+            _attackCount++;
+        }
+        
         public bool IsDead
         {
             get { return CurrentHp <= 0f; }
@@ -25,29 +36,34 @@ namespace SkillFeatureStudy
             CurrentHp = startHp;
         }
 
-        // 유니크 하나를 낀다. 같은 유니크를 두 번 끼면 목록에 두 개가 들어간다
-        public void Equip(UniqueType uniqueType)
+        public void StartSetting()
         {
-            _equippedUniques.Add(uniqueType);
+            _surviveLethalOnceCount = 0;
+        }
+        
+        // 유니크 하나를 낀다. 같은 유니크를 두 번 끼면 목록에 두 개가 들어간다
+        public void Equip(EUniqueType eUniqueType)
+        {
+            _equippedUniques.Add(eUniqueType);
         }
 
         // 유니크 하나를 뺀다. 같은 유니크가 두 개면 하나만 빠진다
-        public void Unequip(UniqueType uniqueType)
+        public void Unequip(EUniqueType eUniqueType)
         {
-            _equippedUniques.Remove(uniqueType);
+            _equippedUniques.Remove(eUniqueType);
         }
 
-        public bool HasUnique(UniqueType uniqueType)
+        public bool HasUnique(EUniqueType eUniqueType)
         {
-            return _equippedUniques.Contains(uniqueType);
+            return _equippedUniques.Contains(eUniqueType);
         }
 
-        public int CountUnique(UniqueType uniqueType)
+        public int CountUnique(EUniqueType eUniqueType)
         {
             int uniqueCount = 0;
-            foreach (UniqueType equippedUnique in _equippedUniques)
+            foreach (EUniqueType equippedUnique in _equippedUniques)
             {
-                if (equippedUnique == uniqueType)
+                if (equippedUnique == eUniqueType)
                 {
                     ++uniqueCount;
                 }
@@ -63,12 +79,24 @@ namespace SkillFeatureStudy
                 return;
             }
 
+            if (HasUnique(EUniqueType.DamageTakenReduction10))
+            {
+                int reductionValue = CountUnique(EUniqueType.DamageTakenReduction10);
+                incomingDamage *= (1f - (0.1f * reductionValue));
+            }
+            
             if (CurrentHp - incomingDamage > 0f)
             {
                 CurrentHp -= incomingDamage;
                 return;
             }
-
+            
+            if (_surviveLethalOnceCount == 0 && HasUnique(EUniqueType.SurviveLethalOncePerStage))
+            {
+                CurrentHp = 1f;
+                ++_surviveLethalOnceCount;
+                return;
+            }
             CurrentHp = 0f;
         }
     }

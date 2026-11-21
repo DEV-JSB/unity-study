@@ -5,7 +5,7 @@ namespace SkillFeatureStudy
     //
     // 작업자가 채울 곳: 아래 세 유니크의 동작. 어느 파일 어디에 넣을지도 작업자가 정한다.
     // 정답은 UniqueBehaviourChecker 의 시나리오 2~6 이다.
-    public enum UniqueType
+    public enum EUniqueType
     {
         // A. 스테이지당 한 번, 쓰러질 피해를 받으면 체력 1로 버틴다.
         //    같은 스테이지에서 뺐다 다시 껴도 다시 쓸 수 없다. 새 스테이지가 시작되면 다시 쓸 수 있다
