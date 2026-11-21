@@ -13,7 +13,8 @@ namespace SkillFeatureStudy
         public int AttackCount => _attackCount;
         
         
-        private readonly List<EUniqueType> _equippedUniques = new List<EUniqueType>();
+        // 장비 고유 번호 → 낀 장비. 장비 하나에 유니크 모드가 하나 달려 있다
+        private readonly Dictionary<ulong, Gear> _equippedGearsByUniqueId = new Dictionary<ulong, Gear>();
 
         private Dictionary<EUniqueType, int> _uniqueActivateCount = new Dictionary<EUniqueType, int>();
         
@@ -42,29 +43,31 @@ namespace SkillFeatureStudy
             _uniqueActivateCount.Clear();
         }
         
-        // 유니크 하나를 낀다. 같은 유니크를 두 번 끼면 목록에 두 개가 들어간다
-        public void Equip(EUniqueType eUniqueType)
+        // 장비 하나를 낀다. 같은 유니크가 달린 장비를 두 개 끼면 (고유 번호가 다르니) 두 개 다 들어간다.
+        // 이미 낀 장비(같은 고유 번호)를 또 끼면 아무 일도 없다
+        public void Equip(Gear gear)
         {
-            _equippedUniques.Add(eUniqueType);
+            _equippedGearsByUniqueId.TryAdd(gear.UniqueId, gear);
         }
 
-        // 유니크 하나를 뺀다. 같은 유니크가 두 개면 하나만 빠진다
-        public void Unequip(EUniqueType eUniqueType)
+        // 장비 고유 번호로 장비 하나를 뺀다. 끼지 않은 번호면 아무 일도 없다
+        public void Unequip(ulong gearUniqueId)
         {
-            _equippedUniques.Remove(eUniqueType);
+            _equippedGearsByUniqueId.Remove(gearUniqueId);
         }
 
         public bool HasUnique(EUniqueType eUniqueType)
         {
-            return _equippedUniques.Contains(eUniqueType);
+            return CountUnique(eUniqueType) > 0;
         }
 
+        // 낀 장비 중 이 유니크가 달린 장비 개수
         public int CountUnique(EUniqueType eUniqueType)
         {
             int uniqueCount = 0;
-            foreach (EUniqueType equippedUnique in _equippedUniques)
+            foreach (Gear equippedGear in _equippedGearsByUniqueId.Values)
             {
-                if (equippedUnique == eUniqueType)
+                if (equippedGear.UniqueType == eUniqueType)
                 {
                     ++uniqueCount;
                 }

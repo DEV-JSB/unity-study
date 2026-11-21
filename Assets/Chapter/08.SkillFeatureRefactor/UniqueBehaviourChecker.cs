@@ -13,9 +13,14 @@ namespace SkillFeatureStudy
     //   전부 성공으로 나와야 한다.
     //
     // 검사기가 부르는 바깥 버튼 — 리팩토링 뒤에도 이 이름과 모양은 남겨야 한다
-    //   new Hero(heroName, startHp, attackPower), hero.Equip, hero.Unequip, hero.TakeDamage,
+    //   new Hero(heroName, startHp, attackPower), new Gear(uniqueId, uniqueType),
+    //   hero.Equip(gear), hero.Unequip(gearUniqueId), hero.TakeDamage,
     //   hero.CurrentHp, hero.IsDead, new Stage(heroes), stage.StartStage,
     //   new Battle(), battle.BaseAttack, AttackResult.isCritical
+    //
+    // 장비 기준으로 바뀐 이유: 유니크 모드는 장비에 달려 있고, 장비는 고유 번호(ulong)로 구분한다 (TBH 와 같은 가정).
+    //   같은 유니크가 달린 장비를 두 개 껴도 뺄 때 고유 번호로 어느 장비인지 정확히 고른다.
+    //   이 변경 때 바뀐 것은 부르는 모양뿐이고, 각 시나리오의 정답 값은 그대로다.
     //
     // Console에는 시나리오 하나 = 로그 하나. 성공은 일반 로그, 실패는 빨간 에러. 클릭하면 단계별 값이 나온다.
     public class UniqueBehaviourChecker : MonoBehaviour
@@ -125,7 +130,8 @@ namespace SkillFeatureStudy
         {
             var scenarioRecord = new ScenarioRecord("2. A 스테이지당 한 번 치명상 버티기");
             var hero = new Hero("Knight", 100f, 10f);
-            hero.Equip(EUniqueType.SurviveLethalOncePerStage);
+            var surviveLethalGear = new Gear(201UL, EUniqueType.SurviveLethalOncePerStage);
+            hero.Equip(surviveLethalGear);
             var stage = new Stage(hero);
             stage.StartStage();
 
@@ -147,15 +153,16 @@ namespace SkillFeatureStudy
         {
             var scenarioRecord = new ScenarioRecord("3. A 같은 스테이지에서 뺐다 끼기");
             var hero = new Hero("Knight", 100f, 10f);
-            hero.Equip(EUniqueType.SurviveLethalOncePerStage);
+            var surviveLethalGear = new Gear(301UL, EUniqueType.SurviveLethalOncePerStage);
+            hero.Equip(surviveLethalGear);
             var stage = new Stage(hero);
             stage.StartStage();
 
             hero.TakeDamage(150f);
             scenarioRecord.ExpectHp("체력 100에서 피해 150 → 버팀", hero, 1f);
 
-            hero.Unequip(EUniqueType.SurviveLethalOncePerStage);
-            hero.Equip(EUniqueType.SurviveLethalOncePerStage);
+            hero.Unequip(surviveLethalGear.UniqueId);
+            hero.Equip(surviveLethalGear);
             hero.TakeDamage(150f);
             scenarioRecord.ExpectHp("A를 뺐다 다시 끼고 피해 150 → 이미 써서 쓰러짐", hero, 0f);
             return scenarioRecord;
@@ -167,7 +174,7 @@ namespace SkillFeatureStudy
             var scenarioRecord = new ScenarioRecord("4. B 다섯 번째 평타마다 치명타");
 
             var attackerWithUnique = new Hero("Archer", 100f, 10f);
-            attackerWithUnique.Equip(EUniqueType.EveryFifthBaseAttackCritical);
+            attackerWithUnique.Equip(new Gear(401UL, EUniqueType.EveryFifthBaseAttackCritical));
             var targetOfUnique = new Hero("Dummy", 1000f, 0f);
             var stage = new Stage(attackerWithUnique, targetOfUnique);
             stage.StartStage();
@@ -197,19 +204,22 @@ namespace SkillFeatureStudy
             var stage = new Stage(hero);
             stage.StartStage();
 
-            hero.Equip(EUniqueType.DamageTakenReduction10);
+            var firstReductionGear = new Gear(501UL, EUniqueType.DamageTakenReduction10);
+            var secondReductionGear = new Gear(502UL, EUniqueType.DamageTakenReduction10);
+
+            hero.Equip(firstReductionGear);
             hero.TakeDamage(100f);
             scenarioRecord.ExpectHp("C 한 개, 피해 100 → 90 받음", hero, 910f);
 
-            hero.Equip(EUniqueType.DamageTakenReduction10);
+            hero.Equip(secondReductionGear);
             hero.TakeDamage(100f);
             scenarioRecord.ExpectHp("C 두 개, 피해 100 → 80 받음", hero, 830f);
 
-            hero.Unequip(EUniqueType.DamageTakenReduction10);
+            hero.Unequip(secondReductionGear.UniqueId);
             hero.TakeDamage(100f);
             scenarioRecord.ExpectHp("C 하나 뺌(한 개 남음), 피해 100 → 90 받음", hero, 740f);
 
-            hero.Unequip(EUniqueType.DamageTakenReduction10);
+            hero.Unequip(firstReductionGear.UniqueId);
             hero.TakeDamage(100f);
             scenarioRecord.ExpectHp("C 다 뺌, 피해 100 → 100 받음", hero, 640f);
             return scenarioRecord;
@@ -220,8 +230,8 @@ namespace SkillFeatureStudy
         {
             var scenarioRecord = new ScenarioRecord("6. A + C 순서 (감소 먼저, 치명상 판정 나중)");
             var hero = new Hero("Knight", 100f, 10f);
-            hero.Equip(EUniqueType.SurviveLethalOncePerStage);
-            hero.Equip(EUniqueType.DamageTakenReduction10);
+            hero.Equip(new Gear(601UL, EUniqueType.SurviveLethalOncePerStage));
+            hero.Equip(new Gear(602UL, EUniqueType.DamageTakenReduction10));
             var stage = new Stage(hero);
             stage.StartStage();
 
