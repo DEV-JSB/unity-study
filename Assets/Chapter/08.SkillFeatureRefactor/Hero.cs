@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace SkillFeatureStudy
@@ -14,11 +15,15 @@ namespace SkillFeatureStudy
         
         
         // 장비 고유 번호 → 낀 장비. 장비 하나에 유니크 모드가 하나 달려 있다
-        private readonly Dictionary<ulong, Gear> _equippedGearsByUniqueId = new Dictionary<ulong, Gear>();
+        private readonly Dictionary<ulong, Gear> _equippedGearsByUniqueId = new ();
 
         private readonly Dictionary<ulong, UniqueModBase> _equippedUniqueMod = new ();
-        private Dictionary<EUniqueType, int> _uniqueActivateCount = new Dictionary<EUniqueType, int>();
+        private Dictionary<EUniqueType, int> _uniqueActivateCount = new ();
 
+        public readonly Observer<DamageContext> DamageModifying = new ();
+        public readonly Observer<DamageContext> DamageApplying = new ();
+        public readonly Observer<BaseAttackContext> BaseAttacking = new();
+        
         public float CurrentHp { get; private set; }
 
 
