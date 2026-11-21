@@ -4,7 +4,7 @@ namespace SkillFeatureStudy
     public class DamageContext
     {
         public float Damage;
-        public float MinimumRemainingHp;
+        public float DamageDecreaseRatio;
         
         public DamageContext(float damage)
         {

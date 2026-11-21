@@ -9,7 +9,6 @@ namespace SkillFeatureStudy
     {
 
         public bool IsCritical;
-
         public BaseAttackContext(bool isCritical)
         {
             IsCritical = isCritical;

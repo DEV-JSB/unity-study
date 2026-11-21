@@ -26,6 +26,10 @@ namespace SkillFeatureStudy
         
         public float CurrentHp { get; private set; }
 
+        public int GetUniqueActivatedCount(EUniqueType eUniqueType)
+        {
+            return _uniqueActivateCount.GetValueOrDefault(eUniqueType);
+        }
 
         public void IncreaseAttackCount()
         {
@@ -65,10 +69,10 @@ namespace SkillFeatureStudy
                     uniqueMod = new SurviveLethalMod();
                     break;
                 case EUniqueType.DamageTakenReduction10:
-                    uniqueMod = new DamageTakenReductionMod();
+                    uniqueMod = new DamageTakenReductionMod(0.1f);
                     break;
                 case EUniqueType.EveryFifthBaseAttackCritical:
-                    uniqueMod = new EveryNthBaseAttackCriticalMod();
+                    uniqueMod = new EveryNthBaseAttackCriticalMod(5);
                     break;
             }
 
@@ -93,24 +97,6 @@ namespace SkillFeatureStudy
             }
         }
 
-        public bool HasUnique(EUniqueType eUniqueType)
-        {
-            return CountUnique(eUniqueType) > 0;
-        }
-
-        // 낀 장비 중 이 유니크가 달린 장비 개수
-        public int CountUnique(EUniqueType eUniqueType)
-        {
-            int uniqueCount = 0;
-            foreach (Gear equippedGear in _equippedGearsByUniqueId.Values)
-            {
-                if (equippedGear.UniqueType == eUniqueType)
-                {
-                    ++uniqueCount;
-                }
-            }
-            return uniqueCount;
-        }
 
         // 피해를 받는다. 체력이 0 이하가 되면 0으로 두고 쓰러진다
         public void TakeDamage(float incomingDamage)
@@ -119,32 +105,26 @@ namespace SkillFeatureStudy
             {
                 return;
             }
-
-            if (HasUnique(EUniqueType.DamageTakenReduction10))
-            {
-                int reductionValue = CountUnique(EUniqueType.DamageTakenReduction10);
-                incomingDamage *= (1f - (0.1f * reductionValue));
-            }
             
-            if (CurrentHp - incomingDamage > 0f)
+            DamageContext damageContext = new DamageContext(incomingDamage);
+            DamageModifying.Notify(damageContext);
+            
+            
+            // TakeDamage 함수에서 왜 DamageDecreaseRatio 를 해야하는가? 맞지 않는 설계 방식이다
+            // 추 후 개선ㅇ르 할 예정이다.
+            damageContext.Damage *= (1f - damageContext.DamageDecreaseRatio);
+            DamageApplying.Notify(damageContext);
+            
+            if (CurrentHp - damageContext.Damage > 0f)
             {
-                CurrentHp -= incomingDamage;
-                return;
-            }
-
-
-            if (!_uniqueActivateCount.TryGetValue(EUniqueType.SurviveLethalOncePerStage, out int activateCount) &&
-                HasUnique(EUniqueType.SurviveLethalOncePerStage))
-            {
-                IncreaseUniqueActivateCount(EUniqueType.SurviveLethalOncePerStage, 1);
-                CurrentHp = 1f;
+                CurrentHp -= damageContext.Damage;
                 return;
             }
 
             CurrentHp = 0f;
         }
 
-        private void IncreaseUniqueActivateCount(EUniqueType eUniqueType, int count)
+        public void IncreaseUniqueActivateCount(EUniqueType eUniqueType, int count)
         {
             if (!_uniqueActivateCount.TryAdd(eUniqueType, 1))
             {

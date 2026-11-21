@@ -10,11 +10,9 @@ namespace SkillFeatureStudy
         {
             bool criticalAttack = false;
             attacker.IncreaseAttackCount();
-            if (attacker.HasUnique(EUniqueType.EveryFifthBaseAttackCritical) && attacker.AttackCount % 5 == 0)
-            {
-                criticalAttack = true;
-            }
-            AttackResult attackResult = DamageCalculator.CalculateBaseAttack(attacker, criticalAttack);
+            BaseAttackContext context = new(false);
+            attacker.BaseAttacking.Notify(context);
+            AttackResult attackResult = DamageCalculator.CalculateBaseAttack(attacker, context.IsCritical);
             target.TakeDamage(attackResult.damage);
             return attackResult;
         }
