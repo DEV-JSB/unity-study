@@ -15,7 +15,8 @@ namespace SkillFeatureStudy
         
         private readonly List<EUniqueType> _equippedUniques = new List<EUniqueType>();
 
-        private int _surviveLethalOnceCount;
+        private Dictionary<EUniqueType, int> _uniqueActivateCount = new Dictionary<EUniqueType, int>();
+        
         public float CurrentHp { get; private set; }
 
 
@@ -38,7 +39,7 @@ namespace SkillFeatureStudy
 
         public void StartSetting()
         {
-            _surviveLethalOnceCount = 0;
+            _uniqueActivateCount.Clear();
         }
         
         // 유니크 하나를 낀다. 같은 유니크를 두 번 끼면 목록에 두 개가 들어간다
@@ -90,14 +91,27 @@ namespace SkillFeatureStudy
                 CurrentHp -= incomingDamage;
                 return;
             }
-            
-            if (_surviveLethalOnceCount == 0 && HasUnique(EUniqueType.SurviveLethalOncePerStage))
+
+
+            if (!_uniqueActivateCount.TryGetValue(EUniqueType.SurviveLethalOncePerStage, out int activateCount) &&
+                HasUnique(EUniqueType.SurviveLethalOncePerStage))
             {
+                IncreaseUniqueActivateCount(EUniqueType.SurviveLethalOncePerStage, 1);
                 CurrentHp = 1f;
-                ++_surviveLethalOnceCount;
                 return;
             }
+
             CurrentHp = 0f;
         }
+
+        private void IncreaseUniqueActivateCount(EUniqueType eUniqueType, int count)
+        {
+            if (!_uniqueActivateCount.TryAdd(eUniqueType, 1))
+            {
+                _uniqueActivateCount[eUniqueType]++;
+            }
+        }
+
+
     }
 }
