@@ -1,16 +1,15 @@
 using UnityEngine;
 
-public class DamageTakenReductionMod : MonoBehaviour
+namespace SkillFeatureStudy
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class DamageTakenReductionMod : UniqueModBase
     {
-        
-    }
+        protected override void UnsubscribeEvents(Hero hero)
+        {
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        protected override void SubscribeEvents(Hero hero)
+        {
+        }
     }
 }

@@ -1,16 +1,20 @@
 using UnityEngine;
 
-public class SurviveLethalMod : MonoBehaviour
+
+
+namespace SkillFeatureStudy
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class SurviveLethalMod : UniqueModBase
     {
-        
+        protected override void UnsubscribeEvents(Hero hero)
+        {
+        }
+
+        protected override void SubscribeEvents(Hero hero)
+        {
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }
+

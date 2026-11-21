@@ -1,16 +1,17 @@
 using UnityEngine;
 
-public class EveryNthBaseAttackCriticalMod : MonoBehaviour
-{
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+namespace SkillFeatureStudy
+{
+    public class EveryNthBaseAttackCriticalMod : UniqueModBase
     {
-        
+        protected override void UnsubscribeEvents(Hero hero)
+        {
+        }
+
+        protected override void SubscribeEvents(Hero hero)
+        {
+        }
     }
 }
+

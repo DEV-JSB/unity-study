@@ -16,8 +16,9 @@ namespace SkillFeatureStudy
         // 장비 고유 번호 → 낀 장비. 장비 하나에 유니크 모드가 하나 달려 있다
         private readonly Dictionary<ulong, Gear> _equippedGearsByUniqueId = new Dictionary<ulong, Gear>();
 
+        private readonly Dictionary<ulong, UniqueModBase> _equippedUniqueMod = new ();
         private Dictionary<EUniqueType, int> _uniqueActivateCount = new Dictionary<EUniqueType, int>();
-        
+
         public float CurrentHp { get; private set; }
 
 
@@ -47,13 +48,44 @@ namespace SkillFeatureStudy
         // 이미 낀 장비(같은 고유 번호)를 또 끼면 아무 일도 없다
         public void Equip(Gear gear)
         {
-            _equippedGearsByUniqueId.TryAdd(gear.UniqueId, gear);
+            if (!_equippedGearsByUniqueId.TryAdd(gear.UniqueId, gear))
+            {
+                return;
+            }
+
+            UniqueModBase uniqueMod = null;
+            switch (gear.UniqueType)
+            {
+                case EUniqueType.SurviveLethalOncePerStage:
+                    uniqueMod = new SurviveLethalMod();
+                    break;
+                case EUniqueType.DamageTakenReduction10:
+                    uniqueMod = new DamageTakenReductionMod();
+                    break;
+                case EUniqueType.EveryFifthBaseAttackCritical:
+                    uniqueMod = new EveryNthBaseAttackCriticalMod();
+                    break;
+            }
+
+            if (uniqueMod == null)
+            {
+                return;
+            }
+
+            uniqueMod.Attach(this);
+            _equippedUniqueMod.Add(gear.UniqueId, uniqueMod);
         }
 
         // 장비 고유 번호로 장비 하나를 뺀다. 끼지 않은 번호면 아무 일도 없다
         public void Unequip(ulong gearUniqueId)
         {
             _equippedGearsByUniqueId.Remove(gearUniqueId);
+
+            if (_equippedUniqueMod.TryGetValue(gearUniqueId, out UniqueModBase uniqueMod))
+            {
+                uniqueMod.Detach();
+                _equippedUniqueMod.Remove(gearUniqueId);
+            }
         }
 
         public bool HasUnique(EUniqueType eUniqueType)
