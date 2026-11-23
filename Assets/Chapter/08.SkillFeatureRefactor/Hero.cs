@@ -9,6 +9,13 @@ namespace SkillFeatureStudy
     // (규칙은 EUniqueType.cs, 정답은 검사기).
     public class Hero
     {
+        // 다음에 만들어질 영웅에게 줄 고유 키. 영웅을 만들 때마다 1씩 늘어나서 겹치지 않는다.
+        // static 이라 모든 영웅이 이 칸 하나를 같이 쓴다 (그래야 번호가 이어진다)
+        private static int _nextHeroKey = 1;
+
+        // 이 영웅의 고유 키. 영웅마다 다르고 바뀌지 않는다. 유니크 모드의 static 기록(영웅 → 사용 횟수)에서 키로 쓴다
+        public int HeroKey { get; }
+
         public readonly string heroName;
         public readonly float attackPower;
         private int _attackCount = 0;
@@ -44,6 +51,9 @@ namespace SkillFeatureStudy
 
         public Hero(string heroName, float startHp, float attackPower)
         {
+            HeroKey = _nextHeroKey;
+            ++_nextHeroKey;
+
             this.heroName = heroName;
             this.attackPower = attackPower;
             CurrentHp = startHp;
