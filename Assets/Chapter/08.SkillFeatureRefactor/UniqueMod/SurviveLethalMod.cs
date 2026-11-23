@@ -43,11 +43,9 @@ namespace SkillFeatureStudy
         {
             if (!_activateHistory.TryGetValue(_ownerHero.HeroKey, out int count) || count <= 0)
             {
-                if (_ownerHero.CurrentHp - context.Damage <= 0 &&
-                    _ownerHero.GetUniqueActivatedCount(EUniqueType.SurviveLethalOncePerStage) == 0)
+                if (_ownerHero.CurrentHp - context.Damage <= 0)
                 {
                     context.Damage = _ownerHero.CurrentHp - 1f;
-                    _ownerHero.IncreaseUniqueActivateCount(EUniqueType.SurviveLethalOncePerStage, 1);
                     if (!_activateHistory.TryAdd(_ownerHero.HeroKey, 1))
                     {
                         _activateHistory[_ownerHero.HeroKey]++;

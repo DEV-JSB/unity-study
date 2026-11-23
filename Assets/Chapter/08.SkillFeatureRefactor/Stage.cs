@@ -15,10 +15,6 @@ namespace SkillFeatureStudy
         // 스테이지를 시작한다
         public void StartStage()
         {
-            foreach (var hero in _heroes)
-            {
-                hero.StartSetting();
-            }
             OnStageStart.Notify(this);
         }
     }

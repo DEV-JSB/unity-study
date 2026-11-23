@@ -25,7 +25,6 @@ namespace SkillFeatureStudy
         // 장비 고유 번호 → 낀 장비. 장비 하나에 유니크 모드가 하나 달려 있다
         private readonly Dictionary<ulong, Gear> _equippedGearsByUniqueId = new ();
 
-        private Dictionary<EUniqueType, int> _uniqueActivateCount = new ();
 
         public readonly Observer<DamageContext> DamageModifying = new ();
         public readonly Observer<DamageContext> DamageApplying = new ();
@@ -33,10 +32,6 @@ namespace SkillFeatureStudy
         
         public float CurrentHp { get; private set; }
 
-        public int GetUniqueActivatedCount(EUniqueType eUniqueType)
-        {
-            return _uniqueActivateCount.GetValueOrDefault(eUniqueType);
-        }
 
         public void IncreaseAttackCount()
         {
@@ -58,10 +53,6 @@ namespace SkillFeatureStudy
             CurrentHp = startHp;
         }
 
-        public void StartSetting()
-        {
-            _uniqueActivateCount.Clear();
-        }
         
         // 장비 하나를 낀다. 같은 유니크가 달린 장비를 두 개 끼면 (고유 번호가 다르니) 두 개 다 들어간다.
         // 같은 장비(같은 고유 번호)는 두 번 낄 수 없다는 게 게임 규칙이라, 들어오면 버그 방어로 무시한다
@@ -108,14 +99,6 @@ namespace SkillFeatureStudy
             }
 
             CurrentHp = 0f;
-        }
-
-        public void IncreaseUniqueActivateCount(EUniqueType eUniqueType, int count)
-        {
-            if (!_uniqueActivateCount.TryAdd(eUniqueType, count))
-            {
-                _uniqueActivateCount[eUniqueType] += count;
-            }
         }
 
 
