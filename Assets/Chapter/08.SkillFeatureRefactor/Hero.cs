@@ -25,7 +25,6 @@ namespace SkillFeatureStudy
         // 장비 고유 번호 → 낀 장비. 장비 하나에 유니크 모드가 하나 달려 있다
         private readonly Dictionary<ulong, Gear> _equippedGearsByUniqueId = new ();
 
-        private readonly Dictionary<ulong, UniqueModBase> _equippedUniqueMod = new ();
         private Dictionary<EUniqueType, int> _uniqueActivateCount = new ();
 
         public readonly Observer<DamageContext> DamageModifying = new ();
@@ -73,27 +72,7 @@ namespace SkillFeatureStudy
                 return;
             }
 
-            UniqueModBase uniqueMod = null;
-            switch (gear.UniqueType)
-            {
-                case EUniqueType.SurviveLethalOncePerStage:
-                    uniqueMod = new SurviveLethalMod();
-                    break;
-                case EUniqueType.DamageTakenReduction10:
-                    uniqueMod = new DamageTakenReductionMod(0.1f);
-                    break;
-                case EUniqueType.EveryFifthBaseAttackCritical:
-                    uniqueMod = new EveryNthBaseAttackCriticalMod(5);
-                    break;
-            }
-
-            if (uniqueMod == null)
-            {
-                return;
-            }
-
-            uniqueMod.Attach(this);
-            _equippedUniqueMod.Add(gear.UniqueId, uniqueMod);
+            UniqueModHandler.EquipUniqueMod(this, gear.UniqueId, gear.UniqueType);
         }
 
         // 장비 고유 번호로 장비 하나를 뺀다. 끼지 않은 번호면 아무 일도 없다
@@ -101,11 +80,7 @@ namespace SkillFeatureStudy
         {
             _equippedGearsByUniqueId.Remove(gearUniqueId);
 
-            if (_equippedUniqueMod.TryGetValue(gearUniqueId, out UniqueModBase uniqueMod))
-            {
-                uniqueMod.Detach();
-                _equippedUniqueMod.Remove(gearUniqueId);
-            }
+            UniqueModHandler.UnEquipUniqueMod(HeroKey, gearUniqueId);
         }
 
 

@@ -12,6 +12,7 @@ namespace SkillFeatureStudy
             _criticalAttackInterval = criticalAttackInterval;
         }
 
+
         protected override void UnsubscribeEvents(Hero hero)
         {
             hero.BaseAttacking.Unsubscribe(OnBaseAttacking);

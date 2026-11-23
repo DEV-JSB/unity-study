@@ -1,6 +1,3 @@
-
-
-
 namespace SkillFeatureStudy
 {
     public abstract class UniqueModBase
@@ -8,18 +5,18 @@ namespace SkillFeatureStudy
         protected Hero _ownerHero;
 
 
-        public void Attach(Hero hero)
+        public virtual void Attach(Hero hero)
         {
             _ownerHero = hero;
             SubscribeEvents(hero);
         }
 
-        public void Detach()
+        public virtual void Detach()
         {
             UnsubscribeEvents(_ownerHero);
             _ownerHero = null;
         }
-        
+
         protected abstract void UnsubscribeEvents(Hero hero);
         protected abstract void SubscribeEvents(Hero hero);
     }

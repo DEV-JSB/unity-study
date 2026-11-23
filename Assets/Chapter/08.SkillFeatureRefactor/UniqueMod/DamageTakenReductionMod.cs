@@ -11,6 +11,8 @@ namespace SkillFeatureStudy
             _damageTakenReductionRatio = damageTakenReductionRatio;
         }
 
+
+
         protected override void UnsubscribeEvents(Hero hero)
         {
             hero.DamageModifying.Unsubscribe(OnDamageModifying);

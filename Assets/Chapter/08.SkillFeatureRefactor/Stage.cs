@@ -5,6 +5,8 @@ namespace SkillFeatureStudy
     {
         private readonly Hero[] _heroes;
 
+        public static readonly Observer<Stage> OnStageStart = new ();
+
         public Stage(params Hero[] heroes)
         {
             _heroes = heroes;
@@ -17,6 +19,7 @@ namespace SkillFeatureStudy
             {
                 hero.StartSetting();
             }
+            OnStageStart.Notify(this);
         }
     }
 }
