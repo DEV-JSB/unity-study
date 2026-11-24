@@ -80,8 +80,14 @@ namespace SkillFeatureStudy
         [ContextMenu("유니크 동작 검사 실행")]
         private void RunAllScenarios()
         {
+            // 게임 시작 때 한 번 부르는 자리를 대신한다
+            UniqueModHandler.Initialize();
+
             var scenarioRunners = new List<Func<ScenarioRecord>>
             {
+                // 7번이 맨 앞인 이유: 사용 기록이 static 이라 시나리오끼리 공유된다.
+                //   앞 시나리오의 영웅이 치명상 버티기 장비를 낀 채로 남아 있으면, 그 장비 쪽에서 기록을 대신 지워 줘서 버그가 가려진다.
+                RunSurviveLethalUnequippedAcrossStageScenario,
                 RunNoUniqueScenario,
                 RunSurviveLethalScenario,
                 RunSurviveLethalReEquipScenario,
@@ -165,6 +171,27 @@ namespace SkillFeatureStudy
             hero.Equip(surviveLethalGear);
             hero.TakeDamage(150f);
             scenarioRecord.ExpectHp("A를 뺐다 다시 끼고 피해 150 → 이미 써서 쓰러짐", hero, 0f);
+            return scenarioRecord;
+        }
+
+        // 7. A: 장비를 뺀 채로 스테이지가 바뀌어도, 다시 끼면 새 스테이지 기준으로 다시 버틴다 (스테이지 초기화를 놓치지 않기)
+        private ScenarioRecord RunSurviveLethalUnequippedAcrossStageScenario()
+        {
+            var scenarioRecord = new ScenarioRecord("7. A 뺀 채로 스테이지가 바뀜");
+            var hero = new Hero("Knight", 100f, 10f);
+            var surviveLethalGear = new Gear(701UL, EUniqueType.SurviveLethalOncePerStage);
+            hero.Equip(surviveLethalGear);
+            var stage = new Stage(hero);
+            stage.StartStage();
+
+            hero.TakeDamage(150f);
+            scenarioRecord.ExpectHp("첫 스테이지, 체력 100에서 피해 150 → 버팀", hero, 1f);
+
+            hero.Unequip(surviveLethalGear.UniqueId);
+            stage.StartStage();
+            hero.Equip(surviveLethalGear);
+            hero.TakeDamage(150f);
+            scenarioRecord.ExpectHp("뺀 사이 새 스테이지, 다시 끼고 피해 150 → 다시 버팀", hero, 1f);
             return scenarioRecord;
         }
 
