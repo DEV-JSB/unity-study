@@ -12,7 +12,7 @@ namespace SkillFeatureStudy
             BaseAttackContext baseAttackContext = new(false);
             attacker.BaseAttacking.Notify(baseAttackContext);
             AttackResult attackResult = DamageCalculator.CalculateBaseAttack(attacker, baseAttackContext.IsCritical);
-            target.TakeDamage(attackResult.damage);
+            DamageCalculator.ApplyAttackResult(target, attackResult);
             return attackResult;
         }
     }

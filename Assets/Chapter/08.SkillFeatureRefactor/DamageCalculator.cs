@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace SkillFeatureStudy
 {
     // 평타 한 번의 결과: 준 피해와 치명타였는지
@@ -19,15 +21,35 @@ namespace SkillFeatureStudy
     {
         public const float CriticalDamageMultiplier = 2f;
 
-        public static AttackResult CalculateBaseAttack(Hero attacker,bool isCritical)
+        
+        public static AttackResult CalculateBaseAttack(Hero attacker, bool isCritical)
         {
             float damage = attacker.attackPower;
-            
+
             if (isCritical)
             {
                 damage *= CriticalDamageMultiplier;
             }
             return new AttackResult(damage, isCritical);
         }
+
+        public static void ApplyAttackResult(Hero target, AttackResult damage)
+        {
+            if (target == null || damage == null)
+            {
+                return;
+            }
+
+            DamageContext damageContext = new DamageContext(damage.damage);
+            target.DamageModifying.Notify(damageContext);
+            
+            // TakeDamage 함수에서 왜 DamageDecreaseRatio 를 해야하는가? 맞지 않는 설계 방식이다
+            // 추후 개선을 할 예정이다.
+            damageContext.Damage *= (1f - damageContext.DamageDecreaseRatio);
+            target.DamageApplying.Notify(damageContext);
+            
+            target.Health.ApplyDamage(damageContext);
+        }
+        
     }
 }

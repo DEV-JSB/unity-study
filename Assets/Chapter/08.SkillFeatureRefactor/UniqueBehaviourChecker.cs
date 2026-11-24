@@ -14,7 +14,7 @@ namespace SkillFeatureStudy
     //
     // 검사기가 부르는 바깥 버튼 — 리팩토링 뒤에도 이 이름과 모양은 남겨야 한다
     //   new Hero(heroName, startHp, attackPower), new Gear(uniqueId, uniqueType),
-    //   hero.Equip(gear), hero.Unequip(gearUniqueId), hero.TakeDamage,
+    //   hero.Equip(gear), hero.Unequip(gearUniqueId), DamageCalculator.ApplyAttackResult(target, attackResult),
     //   hero.CurrentHp, hero.IsDead, new Stage(), stage.StartStage,
     //   new Battle(), battle.BaseAttack, AttackResult.isCritical
     //
@@ -77,6 +77,13 @@ namespace SkillFeatureStudy
             RunAllScenarios();
         }
 
+        // 공격자 없이 피해만 준다 (함정·독 같은 피해 자리). 피해는 Hero 가 아니라 중재자(DamageCalculator)를 거쳐 들어간다.
+        // 중재자의 피해 입구가 바뀌면 이 한 곳만 고친다
+        private static void DealDamage(Hero target, float damage)
+        {
+            DamageCalculator.ApplyAttackResult(target, new AttackResult(damage, false));
+        }
+
         [ContextMenu("유니크 동작 검사 실행")]
         private void RunAllScenarios()
         {
@@ -94,6 +101,7 @@ namespace SkillFeatureStudy
                 RunEveryFifthCriticalScenario,
                 RunDamageTakenReductionScenario,
                 RunSurviveLethalWithReductionScenario,
+                RunUniqueOnlyForOwnerScenario,
             };
 
             foreach (Func<ScenarioRecord> runScenario in scenarioRunners)
@@ -122,10 +130,10 @@ namespace SkillFeatureStudy
             var stage = new Stage();
             stage.StartStage();
 
-            hero.TakeDamage(30f);
+            DealDamage(hero, 30f);
             scenarioRecord.ExpectHp("체력 100에서 피해 30", hero, 70f);
 
-            hero.TakeDamage(200f);
+            DealDamage(hero, 200f);
             scenarioRecord.ExpectHp("체력 70에서 피해 200 (버티기 없음)", hero, 0f);
             scenarioRecord.ExpectDead("쓰러졌나", hero, true);
             return scenarioRecord;
@@ -141,14 +149,14 @@ namespace SkillFeatureStudy
             var stage = new Stage();
             stage.StartStage();
 
-            hero.TakeDamage(150f);
+            DealDamage(hero, 150f);
             scenarioRecord.ExpectHp("첫 스테이지, 체력 100에서 피해 150 → 버팀", hero, 1f);
 
             stage.StartStage();
-            hero.TakeDamage(150f);
+            DealDamage(hero, 150f);
             scenarioRecord.ExpectHp("새 스테이지, 체력 1에서 피해 150 → 다시 버팀", hero, 1f);
 
-            hero.TakeDamage(150f);
+            DealDamage(hero, 150f);
             scenarioRecord.ExpectHp("같은 스테이지, 체력 1에서 피해 150 → 이미 써서 쓰러짐", hero, 0f);
             scenarioRecord.ExpectDead("쓰러졌나", hero, true);
             return scenarioRecord;
@@ -164,12 +172,12 @@ namespace SkillFeatureStudy
             var stage = new Stage();
             stage.StartStage();
 
-            hero.TakeDamage(150f);
+            DealDamage(hero, 150f);
             scenarioRecord.ExpectHp("체력 100에서 피해 150 → 버팀", hero, 1f);
 
             hero.Unequip(surviveLethalGear.UniqueId);
             hero.Equip(surviveLethalGear);
-            hero.TakeDamage(150f);
+            DealDamage(hero, 150f);
             scenarioRecord.ExpectHp("A를 뺐다 다시 끼고 피해 150 → 이미 써서 쓰러짐", hero, 0f);
             return scenarioRecord;
         }
@@ -184,13 +192,13 @@ namespace SkillFeatureStudy
             var stage = new Stage();
             stage.StartStage();
 
-            hero.TakeDamage(150f);
+            DealDamage(hero, 150f);
             scenarioRecord.ExpectHp("첫 스테이지, 체력 100에서 피해 150 → 버팀", hero, 1f);
 
             hero.Unequip(surviveLethalGear.UniqueId);
             stage.StartStage();
             hero.Equip(surviveLethalGear);
-            hero.TakeDamage(150f);
+            DealDamage(hero, 150f);
             scenarioRecord.ExpectHp("뺀 사이 새 스테이지, 다시 끼고 피해 150 → 다시 버팀", hero, 1f);
             return scenarioRecord;
         }
@@ -235,20 +243,43 @@ namespace SkillFeatureStudy
             var secondReductionGear = new Gear(502UL, EUniqueType.DamageTakenReduction10);
 
             hero.Equip(firstReductionGear);
-            hero.TakeDamage(100f);
+            DealDamage(hero, 100f);
             scenarioRecord.ExpectHp("C 한 개, 피해 100 → 90 받음", hero, 910f);
 
             hero.Equip(secondReductionGear);
-            hero.TakeDamage(100f);
+            DealDamage(hero, 100f);
             scenarioRecord.ExpectHp("C 두 개, 피해 100 → 80 받음", hero, 830f);
 
             hero.Unequip(secondReductionGear.UniqueId);
-            hero.TakeDamage(100f);
+            DealDamage(hero, 100f);
             scenarioRecord.ExpectHp("C 하나 뺌(한 개 남음), 피해 100 → 90 받음", hero, 740f);
 
             hero.Unequip(firstReductionGear.UniqueId);
-            hero.TakeDamage(100f);
+            DealDamage(hero, 100f);
             scenarioRecord.ExpectHp("C 다 뺌, 피해 100 → 100 받음", hero, 640f);
+            return scenarioRecord;
+        }
+
+        // 8. A, C: 유니크는 그 장비를 낀 영웅이 맞을 때만 동작한다. 다른 영웅이 맞을 때 끼어들면 안 된다
+        private ScenarioRecord RunUniqueOnlyForOwnerScenario()
+        {
+            var scenarioRecord = new ScenarioRecord("8. 유니크는 낀 영웅에게만");
+            var reductionOwner = new Hero("ReductionOwner", 1000f, 10f);
+            var surviveOwner = new Hero("SurviveOwner", 10f, 10f);
+            var heroWithoutUnique = new Hero("NoUnique", 100f, 10f);
+            reductionOwner.Equip(new Gear(801UL, EUniqueType.DamageTakenReduction10));
+            surviveOwner.Equip(new Gear(802UL, EUniqueType.SurviveLethalOncePerStage));
+            var stage = new Stage();
+            stage.StartStage();
+
+            DealDamage(heroWithoutUnique, 50f);
+            scenarioRecord.ExpectHp("유니크 없는 영웅이 피해 50 → 감소·버티기 끼어들지 않음", heroWithoutUnique, 50f);
+
+            DealDamage(reductionOwner, 100f);
+            scenarioRecord.ExpectHp("C를 낀 영웅이 피해 100 → 90 받음", reductionOwner, 910f);
+
+            DealDamage(surviveOwner, 50f);
+            scenarioRecord.ExpectHp("A를 낀 영웅(체력 10)이 피해 50 → 버팀 (C는 남의 것이라 안 줄어듦)", surviveOwner, 1f);
             return scenarioRecord;
         }
 
@@ -262,13 +293,13 @@ namespace SkillFeatureStudy
             var stage = new Stage();
             stage.StartStage();
 
-            hero.TakeDamage(105f);
+            DealDamage(hero, 105f);
             scenarioRecord.ExpectHp("체력 100에서 피해 105 → 10% 줄어 94.5 → 안 쓰러짐(A 안 씀)", hero, 5.5f);
 
-            hero.TakeDamage(200f);
+            DealDamage(hero, 200f);
             scenarioRecord.ExpectHp("피해 200 → 180 → 쓰러질 피해라 A로 버팀", hero, 1f);
 
-            hero.TakeDamage(200f);
+            DealDamage(hero, 200f);
             scenarioRecord.ExpectHp("피해 200 → A 이미 써서 쓰러짐", hero, 0f);
             return scenarioRecord;
         }

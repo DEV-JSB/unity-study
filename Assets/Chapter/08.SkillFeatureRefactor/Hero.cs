@@ -26,8 +26,11 @@ namespace SkillFeatureStudy
         private readonly Dictionary<ulong, Gear> _equippedGearsByUniqueId = new ();
 
 
+        
+        
         public readonly Observer<DamageContext> DamageModifying = new ();
         public readonly Observer<DamageContext> DamageApplying = new ();
+
         public readonly Observer<BaseAttackContext> BaseAttacking = new();
         
         // 체력은 HealthController 가 맡는다. 검사기가 hero.CurrentHp / hero.IsDead 를 쓰니까 이름은 남긴다
@@ -49,7 +52,9 @@ namespace SkillFeatureStudy
             this.heroName = heroName;
             this.attackPower = attackPower;
             Health = new HealthController(startHp);
+            Health.Damaged.Subscribe(OnDamaged);
             Health.Died.Subscribe(OnDied);
+            Health.HpChanged.Subscribe(OnHpChanged);
         }
 
         // 쓰러졌을 때 영웅이 할 일 (지금은 없음)
@@ -78,25 +83,15 @@ namespace SkillFeatureStudy
             UniqueModHandler.UnEquipUniqueMod(HeroKey, gearUniqueId);
         }
 
-
-        // 피해를 받는다. 유니크가 피해를 고친 뒤, 최종 피해를 HealthController 에 넘긴다 (0 하한과 쓰러짐은 HealthController 가 맡는다)
-        public void TakeDamage(float incomingDamage)
+        // 피해를 받았을 때의 연출 (피격 이펙트처럼 피해 정보가 필요한 것. 지금은 없음)
+        private void OnDamaged(DamageContext damageContext)
         {
-            if (IsDead)
-            {
-                return;
-            }
+        }
+
+        // 체력이 감소했을때의 연출
+        public void OnHpChanged(float currentHp)
+        {
             
-            DamageContext damageContext = new DamageContext(incomingDamage);
-            DamageModifying.Notify(damageContext);
-            
-            
-            // TakeDamage 함수에서 왜 DamageDecreaseRatio 를 해야하는가? 맞지 않는 설계 방식이다
-            // 추후 개선을 할 예정이다.
-            damageContext.Damage *= (1f - damageContext.DamageDecreaseRatio);
-            DamageApplying.Notify(damageContext);
-            
-            Health.ApplyDamage(damageContext.Damage);
         }
 
 
