@@ -15,7 +15,7 @@ namespace SkillFeatureStudy
     // 검사기가 부르는 바깥 버튼 — 리팩토링 뒤에도 이 이름과 모양은 남겨야 한다
     //   new Hero(heroName, startHp, attackPower), new Gear(uniqueId, uniqueType),
     //   hero.Equip(gear), hero.Unequip(gearUniqueId), hero.TakeDamage,
-    //   hero.CurrentHp, hero.IsDead, new Stage(heroes), stage.StartStage,
+    //   hero.CurrentHp, hero.IsDead, new Stage(), stage.StartStage,
     //   new Battle(), battle.BaseAttack, AttackResult.isCritical
     //
     // 장비 기준으로 바뀐 이유: 유니크 모드는 장비에 달려 있고, 장비는 고유 번호(ulong)로 구분한다 (TBH 와 같은 가정).
@@ -119,7 +119,7 @@ namespace SkillFeatureStudy
         {
             var scenarioRecord = new ScenarioRecord("1. 유니크 없음");
             var hero = new Hero("Knight", 100f, 10f);
-            var stage = new Stage(hero);
+            var stage = new Stage();
             stage.StartStage();
 
             hero.TakeDamage(30f);
@@ -138,7 +138,7 @@ namespace SkillFeatureStudy
             var hero = new Hero("Knight", 100f, 10f);
             var surviveLethalGear = new Gear(201UL, EUniqueType.SurviveLethalOncePerStage);
             hero.Equip(surviveLethalGear);
-            var stage = new Stage(hero);
+            var stage = new Stage();
             stage.StartStage();
 
             hero.TakeDamage(150f);
@@ -161,7 +161,7 @@ namespace SkillFeatureStudy
             var hero = new Hero("Knight", 100f, 10f);
             var surviveLethalGear = new Gear(301UL, EUniqueType.SurviveLethalOncePerStage);
             hero.Equip(surviveLethalGear);
-            var stage = new Stage(hero);
+            var stage = new Stage();
             stage.StartStage();
 
             hero.TakeDamage(150f);
@@ -181,7 +181,7 @@ namespace SkillFeatureStudy
             var hero = new Hero("Knight", 100f, 10f);
             var surviveLethalGear = new Gear(701UL, EUniqueType.SurviveLethalOncePerStage);
             hero.Equip(surviveLethalGear);
-            var stage = new Stage(hero);
+            var stage = new Stage();
             stage.StartStage();
 
             hero.TakeDamage(150f);
@@ -203,7 +203,7 @@ namespace SkillFeatureStudy
             var attackerWithUnique = new Hero("Archer", 100f, 10f);
             attackerWithUnique.Equip(new Gear(401UL, EUniqueType.EveryFifthBaseAttackCritical));
             var targetOfUnique = new Hero("Dummy", 1000f, 0f);
-            var stage = new Stage(attackerWithUnique, targetOfUnique);
+            var stage = new Stage();
             stage.StartStage();
             var battle = new Battle();
 
@@ -213,7 +213,7 @@ namespace SkillFeatureStudy
 
             var attackerWithoutUnique = new Hero("Archer", 100f, 10f);
             var targetOfNoUnique = new Hero("Dummy", 1000f, 0f);
-            var stageWithoutUnique = new Stage(attackerWithoutUnique, targetOfNoUnique);
+            var stageWithoutUnique = new Stage();
             stageWithoutUnique.StartStage();
             var battleWithoutUnique = new Battle();
 
@@ -228,7 +228,7 @@ namespace SkillFeatureStudy
         {
             var scenarioRecord = new ScenarioRecord("5. C 받는 피해 10% 감소 (겹치면 더함)");
             var hero = new Hero("Knight", 1000f, 10f);
-            var stage = new Stage(hero);
+            var stage = new Stage();
             stage.StartStage();
 
             var firstReductionGear = new Gear(501UL, EUniqueType.DamageTakenReduction10);
@@ -259,7 +259,7 @@ namespace SkillFeatureStudy
             var hero = new Hero("Knight", 100f, 10f);
             hero.Equip(new Gear(601UL, EUniqueType.SurviveLethalOncePerStage));
             hero.Equip(new Gear(602UL, EUniqueType.DamageTakenReduction10));
-            var stage = new Stage(hero);
+            var stage = new Stage();
             stage.StartStage();
 
             hero.TakeDamage(105f);
