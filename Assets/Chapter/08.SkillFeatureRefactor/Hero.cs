@@ -30,17 +30,15 @@ namespace SkillFeatureStudy
         public readonly Observer<DamageContext> DamageApplying = new ();
         public readonly Observer<BaseAttackContext> BaseAttacking = new();
         
-        public float CurrentHp { get; private set; }
+        // 체력은 HealthController 가 맡는다. 검사기가 hero.CurrentHp / hero.IsDead 를 쓰니까 이름은 남긴다
+        public HealthController Health { get; }
+        public float CurrentHp => Health.CurrentHp;
+        public bool IsDead => Health.IsDead;
 
 
         public void IncreaseAttackCount()
         {
             _attackCount++;
-        }
-        
-        public bool IsDead
-        {
-            get { return CurrentHp <= 0f; }
         }
 
         public Hero(string heroName, float startHp, float attackPower)
@@ -50,7 +48,13 @@ namespace SkillFeatureStudy
 
             this.heroName = heroName;
             this.attackPower = attackPower;
-            CurrentHp = startHp;
+            Health = new HealthController(startHp);
+            Health.Died.Subscribe(OnDied);
+        }
+
+        // 쓰러졌을 때 영웅이 할 일 (지금은 없음)
+        private void OnDied(HealthController health)
+        {
         }
 
         
@@ -75,7 +79,7 @@ namespace SkillFeatureStudy
         }
 
 
-        // 피해를 받는다. 체력이 0 이하가 되면 0으로 두고 쓰러진다
+        // 피해를 받는다. 유니크가 피해를 고친 뒤, 최종 피해를 HealthController 에 넘긴다 (0 하한과 쓰러짐은 HealthController 가 맡는다)
         public void TakeDamage(float incomingDamage)
         {
             if (IsDead)
@@ -92,13 +96,7 @@ namespace SkillFeatureStudy
             damageContext.Damage *= (1f - damageContext.DamageDecreaseRatio);
             DamageApplying.Notify(damageContext);
             
-            if (CurrentHp - damageContext.Damage > 0f)
-            {
-                CurrentHp -= damageContext.Damage;
-                return;
-            }
-
-            CurrentHp = 0f;
+            Health.ApplyDamage(damageContext.Damage);
         }
 
 
