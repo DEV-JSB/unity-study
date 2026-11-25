@@ -3,6 +3,11 @@ using System.Collections.Generic;
 
 namespace SkillFeatureStudy
 {
+    // 유니크 모드 관리자 (static). 두 가지를 맡는다.
+    // 1. 장비 → 유니크 모드 객체: 장비를 끼면 유니크 종류로 객체를 만들어 붙이고(Attach), 빼면 뗀다(Detach)
+    // 2. 사용 기록: 영웅 키 → 유니크 종류 → 이번 스테이지 사용 횟수. 스테이지가 시작되면 비운다
+    // 장비가 하나도 없어도 살아 있어서, 장비를 다 뺀 사이에 스테이지가 바뀌어도 기록 비우기를 놓치지 않는다.
+    // Initialize 는 게임 시작 때 한 번 부른다 (실습에서는 검사기가 그 자리를 대신한다).
     public static class UniqueModHandler
     {
         private static Dictionary<int, Dictionary<ulong, UniqueModBase>> _heroEquippedUniqueMod = new();

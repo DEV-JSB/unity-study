@@ -1,8 +1,8 @@
 namespace SkillFeatureStudy
 {
     // 유니크 목록. TBH 의 EGearUniqueMod 를 아주 작게 줄인 것. enum 값 하나 = 게임에 있는 유니크 하나.
-    // 장비에 달려 있고(Gear.UniqueType), 장비를 끼면 Hero.Equip 이 enum 값에 맞는 유니크 모드 객체를 만든다.
-    // 동작은 UniqueMod 폴더의 각 class 에 있고, 정답은 UniqueBehaviourChecker 의 시나리오 2~6 이다.
+    // 장비에 달려 있고(Gear.UniqueType), 장비를 끼면 UniqueModHandler.EquipUniqueMod 가 enum 값에 맞는 유니크 모드 객체를 만든다.
+    // 동작은 UniqueMod 폴더의 각 class 에 있고, 정답은 UniqueBehaviourChecker 의 시나리오 2~8 이다.
     public enum EUniqueType
     {
         // 치명상 버티기 (검사기의 A) → SurviveLethalMod

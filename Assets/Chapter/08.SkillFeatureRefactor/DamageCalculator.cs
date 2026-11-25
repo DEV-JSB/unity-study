@@ -15,7 +15,9 @@ namespace SkillFeatureStudy
         }
     }
 
-    // 리팩토링 "전" 피해 계산기. 지금은 공격력 그대로 피해를 낸다.
+    // 피해 계산 중재자. 평타 피해를 계산하고(CalculateBaseAttack), 계산한 피해를 대상에게 넣는다(ApplyAttackResult).
+    // 피해를 넣을 때 대상의 사건을 순서대로 울린다: DamageModifying → 감소 비율 곱하기 → DamageApplying → HealthController.
+    // 체력을 바꾸는 문(HealthController.ApplyDamage)은 여기서만 부른다. 다른 곳에서 바로 부르면 유니크를 건너뛴다.
     // 실습을 값으로 확인하려고 무작위 치명타는 없다. 치명타는 피해 2배.
     public static class DamageCalculator
     {
@@ -42,9 +44,7 @@ namespace SkillFeatureStudy
 
             DamageContext damageContext = new DamageContext(damage.damage);
             target.DamageModifying.Notify(damageContext);
-            
-            // TakeDamage 함수에서 왜 DamageDecreaseRatio 를 해야하는가? 맞지 않는 설계 방식이다
-            // 추후 개선을 할 예정이다.
+
             damageContext.Damage *= (1f - damageContext.DamageDecreaseRatio);
             target.DamageApplying.Notify(damageContext);
             

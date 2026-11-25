@@ -2,18 +2,19 @@ using System.Collections.Generic;
 
 namespace SkillFeatureStudy
 {
-    // 영웅. 낀 장비, 체력과 피해 받기, 평타 횟수.
+    // 영웅. 낀 장비, 평타 횟수, 유니크가 구독하는 사건, 체력(HealthController).
     // 유니크 동작은 Hero 에 없다. 장비를 끼면 장비에 달린 유니크 모드 객체(UniqueMod 폴더)가 만들어져
-    // Hero 의 사건(DamageModifying, DamageApplying, BaseAttacking)을 구독하고, Hero 는 알리기만 한다.
-    // 유니크 사용 기록은 Hero 가 유니크 종류별로 들고 있고, 스테이지가 시작되면(StartSetting) 지운다
-    // (규칙은 EUniqueType.cs, 정답은 검사기).
+    // Hero 의 사건(DamageModifying, DamageApplying, BaseAttacking)을 구독한다. 사건을 울리는 건 DamageCalculator 와 Battle 이다.
+    // Hero 에는 피해를 받는 입구가 없다. 피해는 DamageCalculator 를 거쳐 HealthController 로 들어가고,
+    // Hero 는 HealthController 의 알림(Damaged, Died)을 구독해서 연출만 한다.
+    // 유니크 사용 기록은 UniqueModHandler 에 있다 (규칙은 EUniqueType.cs, 정답은 검사기).
     public class Hero
     {
         // 다음에 만들어질 영웅에게 줄 고유 키. 영웅을 만들 때마다 1씩 늘어나서 겹치지 않는다.
         // static 이라 모든 영웅이 이 칸 하나를 같이 쓴다 (그래야 번호가 이어진다)
         private static int _nextHeroKey = 1;
 
-        // 이 영웅의 고유 키. 영웅마다 다르고 바뀌지 않는다. 유니크 모드의 static 기록(영웅 → 사용 횟수)에서 키로 쓴다
+        // 이 영웅의 고유 키. 영웅마다 다르고 바뀌지 않는다. UniqueModHandler 의 사용 기록(영웅 → 유니크 종류 → 횟수)에서 키로 쓴다
         public int HeroKey { get; }
 
         public readonly string heroName;
