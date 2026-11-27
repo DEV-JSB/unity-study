@@ -8,7 +8,7 @@ namespace SkillFeatureStudy
     {
         public void Execute(Hero ownerHero, TriggerContext context)
         {
-            context.DamageContext.
+            
         }
     }
 

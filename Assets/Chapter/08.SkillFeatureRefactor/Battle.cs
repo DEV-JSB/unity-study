@@ -6,14 +6,13 @@ namespace SkillFeatureStudy
     public class Battle
     {
         // 공격자가 대상에게 평타를 한 번 친다
-        public AttackResult BaseAttack(Hero attacker, Hero target)
+        public DamageContext BaseAttack(Hero attacker, Hero target)
         {
             attacker.IncreaseAttackCount();
-            BaseAttackContext baseAttackContext = new(false);
+            DamageContext baseAttackContext = DamageCalculator.GetDamageContext(attacker, false, true);
             attacker.BaseAttacking.Notify(baseAttackContext);
-            AttackResult attackResult = DamageCalculator.CalculateBaseAttack(attacker, baseAttackContext.IsCritical);
-            DamageCalculator.ApplyAttackResult(target, attackResult);
-            return attackResult;
+            DamageCalculator.ApplyDamageContext(target, baseAttackContext);
+            return baseAttackContext;
         }
     }
 }

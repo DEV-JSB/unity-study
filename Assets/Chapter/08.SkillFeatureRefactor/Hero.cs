@@ -17,8 +17,8 @@ namespace SkillFeatureStudy
         // 이 영웅의 고유 키. 영웅마다 다르고 바뀌지 않는다. UniqueModHandler 의 사용 기록(영웅 → 유니크 종류 → 횟수)에서 키로 쓴다
         public int HeroKey { get; }
 
-        public readonly string heroName;
-        public readonly float attackPower;
+        public readonly string HeroName;
+        public readonly float AttackPower;
         private int _attackCount = 0;
         public int AttackCount => _attackCount;
         
@@ -32,7 +32,7 @@ namespace SkillFeatureStudy
         public readonly Observer<DamageContext> DamageModifying = new ();
         public readonly Observer<DamageContext> DamageApplying = new ();
 
-        public readonly Observer<BaseAttackContext> BaseAttacking = new();
+        public readonly Observer<DamageContext> BaseAttacking = new();
         
         // 체력은 HealthController 가 맡는다. 검사기가 hero.CurrentHp / hero.IsDead 를 쓰니까 이름은 남긴다
         public HealthController Health { get; }
@@ -50,8 +50,8 @@ namespace SkillFeatureStudy
             HeroKey = _nextHeroKey;
             ++_nextHeroKey;
 
-            this.heroName = heroName;
-            this.attackPower = attackPower;
+            this.HeroName = heroName;
+            this.AttackPower = attackPower;
             Health = new HealthController(startHp);
             Health.Damaged.Subscribe(OnDamaged);
             Health.Died.Subscribe(OnDied);

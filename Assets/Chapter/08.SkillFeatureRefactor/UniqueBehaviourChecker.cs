@@ -14,9 +14,9 @@ namespace SkillFeatureStudy
     //
     // 검사기가 부르는 바깥 버튼 — 리팩토링 뒤에도 이 이름과 모양은 남겨야 한다
     //   new Hero(heroName, startHp, attackPower), new Gear(uniqueId, uniqueType),
-    //   hero.Equip(gear), hero.Unequip(gearUniqueId), DamageCalculator.ApplyAttackResult(target, attackResult),
+    //   hero.Equip(gear), hero.Unequip(gearUniqueId), DamageCalculator.ApplyDamageContext(target, damageContext),
     //   hero.CurrentHp, hero.IsDead, new Stage(), stage.StartStage,
-    //   new Battle(), battle.BaseAttack, AttackResult.isCritical
+    //   new Battle(), battle.BaseAttack, DamageContext.IsCritical
     //
     // 장비 기준으로 바뀐 이유: 유니크 모드는 장비에 달려 있고, 장비는 고유 번호(ulong)로 구분한다 (TBH 와 같은 가정).
     //   같은 유니크가 달린 장비를 두 개 껴도 뺄 때 고유 번호로 어느 장비인지 정확히 고른다.
@@ -81,7 +81,7 @@ namespace SkillFeatureStudy
         // 중재자의 피해 입구가 바뀌면 이 한 곳만 고친다
         private static void DealDamage(Hero target, float damage)
         {
-            DamageCalculator.ApplyAttackResult(target, new AttackResult(damage, false));
+            DamageCalculator.ApplyDamageContext(target, new DamageContext(damage, false, false));
         }
 
         [ContextMenu("유니크 동작 검사 실행")]
@@ -310,8 +310,8 @@ namespace SkillFeatureStudy
             var criticalAttackNumbers = new List<int>();
             for (int attackNumber = 1; attackNumber <= 10; ++attackNumber)
             {
-                AttackResult attackResult = battle.BaseAttack(attacker, target);
-                if (attackResult.isCritical)
+                DamageContext damageContext = battle.BaseAttack(attacker, target);
+                if (damageContext.IsCritical)
                 {
                     criticalAttackNumbers.Add(attackNumber);
                 }

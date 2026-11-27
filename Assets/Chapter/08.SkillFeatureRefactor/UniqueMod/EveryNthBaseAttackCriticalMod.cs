@@ -23,7 +23,7 @@ namespace SkillFeatureStudy
             hero.BaseAttacking.Subscribe(OnBaseAttacking);
         }
 
-        private void OnBaseAttacking(BaseAttackContext context)
+        private void OnBaseAttacking(DamageContext context)
         {
             if (_ownerHero.AttackCount % _criticalAttackInterval == 0)
             {
