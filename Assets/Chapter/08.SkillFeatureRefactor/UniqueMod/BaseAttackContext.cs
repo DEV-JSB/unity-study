@@ -4,7 +4,7 @@
 namespace SkillFeatureStudy
 {
  
-    public class BaseAttackContext
+    public class BaseAttackContext : TriggerContext
     {
 
         public bool IsCritical;

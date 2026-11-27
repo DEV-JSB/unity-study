@@ -1,7 +1,7 @@
 
 namespace SkillFeatureStudy
 {
-    public class DamageContext
+    public class DamageContext : TriggerContext
     {
         public float Damage;
         public float DamageDecreaseRatio;
