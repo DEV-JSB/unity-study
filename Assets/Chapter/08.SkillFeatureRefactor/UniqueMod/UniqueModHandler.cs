@@ -10,7 +10,7 @@ namespace SkillFeatureStudy
     // Initialize 는 게임 시작 때 한 번 부른다 (실습에서는 검사기가 그 자리를 대신한다).
     public static class UniqueModHandler
     {
-        private static Dictionary<int, Dictionary<ulong, UniqueModBase>> _heroEquippedUniqueMod = new();
+        private static Dictionary<int, Dictionary<ulong, UniqueMod>> _heroEquippedUniqueMod = new();
         
         // 영웅 키 → (유니크 종류 → 이번 스테이지 사용 횟수)
         private static Dictionary<int, Dictionary<EUniqueType, int>> _uniqueActivatedHistory = new();
@@ -50,9 +50,9 @@ namespace SkillFeatureStudy
 
         public static void UnEquipUniqueMod(int heroKey, ulong itemUniqueId)
         {
-            if (_heroEquippedUniqueMod.TryGetValue(heroKey, out Dictionary<ulong, UniqueModBase> uniqueMods))
+            if (_heroEquippedUniqueMod.TryGetValue(heroKey, out Dictionary<ulong, UniqueMod> uniqueMods))
             {
-                if (uniqueMods.TryGetValue(itemUniqueId, out UniqueModBase uniqueMod))
+                if (uniqueMods.TryGetValue(itemUniqueId, out UniqueMod uniqueMod))
                 {
                     uniqueMod.Detach();
                     uniqueMods.Remove(itemUniqueId);
@@ -61,6 +61,41 @@ namespace SkillFeatureStudy
         }
 
         public static void EquipUniqueMod(Hero hero, ulong itemUniqueId, EUniqueType uniqueType)
+        {
+            UniqueMod uniqueMod = null;
+            
+            switch (uniqueType)
+            {
+                case EUniqueType.SurviveLethalOncePerStage:
+                    uniqueMod = new UniqueMod(hero, ETriggerType.DamageApplying,
+                        new IUniqueCondition[]
+                        {
+                            new LethalDamageCondition(),
+                            new UniqueActivationCountBelowCondition(1, EUniqueType.SurviveLethalOncePerStage)
+                        }, new[] { new LeaveHpEffect(1) }, uniqueType);
+                    break;
+                case EUniqueType.DamageTakenReduction10:
+                    uniqueMod = new UniqueMod(hero, ETriggerType.DamageModifying, null,
+                        new[] { new AddDamageDecreaseRatioEffect(0.1f) }, uniqueType);
+                    break;
+                case EUniqueType.EveryFifthBaseAttackCritical:
+                    uniqueMod = new UniqueMod(hero, ETriggerType.BaseAttacking,
+                        new[] { new EveryNthBaseAttackCondition(5) }, new[] { new ForceCriticalEffect() }, uniqueType);
+                    break;
+            }
+
+            if (uniqueMod == null)
+            {
+                return;
+            }
+
+            uniqueMod.Attach();
+            _heroEquippedUniqueMod.TryAdd(hero.HeroKey, new());
+            _heroEquippedUniqueMod[hero.HeroKey].TryAdd(itemUniqueId, uniqueMod);
+        }
+        
+        
+        /*public static void EquipUniqueMod(Hero hero, ulong itemUniqueId, EUniqueType uniqueType)
         {
             UniqueModBase uniqueMod = null;
 
@@ -85,7 +120,7 @@ namespace SkillFeatureStudy
             uniqueMod.Attach(hero);
             _heroEquippedUniqueMod.TryAdd(hero.HeroKey, new());
             _heroEquippedUniqueMod[hero.HeroKey].TryAdd(itemUniqueId, uniqueMod);
-        }
+        }*/
     }
 }
 
